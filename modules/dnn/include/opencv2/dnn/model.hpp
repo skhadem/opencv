@@ -39,42 +39,36 @@
 //
 //M*/
 
-#ifndef OPENCV_DNN_HPP
-#define OPENCV_DNN_HPP
+#ifndef OPENCV_MODEL_HPP
+#define OPENCV_MODEL_HPP
 
-// This is an umbrella header to include into you project.
-// We are free to change headers layout in dnn subfolder, so please include
-// this header for future compatibility
+#include <vector>
+#include <opencv2/core.hpp>
+#ifdef CV_CXX11
+#include <future>
+#endif
+
+#include "version.hpp"
+#include "dnn.hpp"
 
 
-/** @defgroup dnn Deep Neural Network module
-  @{
-    This module contains:
-        - API for new layers creation, layers are building bricks of neural networks;
-        - set of built-in most-useful Layers;
-        - API to construct and modify comprehensive neural networks from layers;
-        - functionality for loading serialized networks models from different frameworks.
+namespace cv {
+namespace dnn {
+CV__DNN_INLINE_NS_BEGIN
+//! @addtogroup dnn
+//! @{
 
-    Functionality of this module is designed only for forward pass computations (i.e. network testing).
-    A network training is in principle not supported.
-  @}
-*/
-/** @example samples/dnn/classification.cpp
-Check @ref tutorial_dnn_googlenet "the corresponding tutorial" for more details
-*/
-/** @example samples/dnn/colorization.cpp
-*/
-/** @example samples/dnn/object_detection.cpp
-Check @ref tutorial_dnn_yolo "the corresponding tutorial" for more details
-*/
-/** @example samples/dnn/openpose.cpp
-*/
-/** @example samples/dnn/segmentation.cpp
-*/
-/** @example samples/dnn/text_detection.cpp
-*/
-/** @example samples/dnn/modelAPI.cpp
-*/
-#include <opencv2/dnn/dnn.hpp>
+class CV_EXPORTS_W_SIMPLE Model : public Net
+{
+public:
+    Model(const std::string &weightsFile, const std::string &config = "", int width = -1, int height = -1, Scalar mean = Scalar(), float scale = 1.0);
+    ~Model();    
+private:
+};
+//! @}
+CV__DNN_INLINE_NS_END
+}
+}
 
-#endif /* OPENCV_DNN_HPP */
+
+#endif // OPENCV_MODEL_HPP

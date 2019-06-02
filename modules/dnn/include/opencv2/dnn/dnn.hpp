@@ -995,6 +995,7 @@ CV__DNN_INLINE_NS_END
 
 #include <opencv2/dnn/layer.hpp>
 #include <opencv2/dnn/dnn.inl.hpp>
+#include <opencv2/dnn/model.hpp>
 
 /// @deprecated Include this header directly from application. Automatic inclusion will be removed
 #include <opencv2/dnn/utils/inference_engine.hpp>
