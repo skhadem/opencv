@@ -24,9 +24,18 @@ int main(int argc, char ** argv)
         parser.printMessage();
         return 0;
     }
-
     const std::string weightsFile = parser.get<std::string>("weights");
 
     Model model(weightsFile);
+
+    VideoCapture cap(0);
+    model.setVideoCapture(cap);
+    Mat frame;
+    while (true)
+    {
+        model.getFrame(frame); // get a new frame from camera
+        imshow("Video", frame);
+        if(waitKey(30) >= 0) break;
+    }
 
 }

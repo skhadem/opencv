@@ -44,6 +44,8 @@
 
 #include <vector>
 #include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
 #ifdef CV_CXX11
 #include <future>
 #endif
@@ -52,18 +54,104 @@
 #include "dnn.hpp"
 
 
+/* todo SK roadmap
+
+see object_detection.cpp
+
+- setup the preprocessing function, use yaml?
+- get a working model running in parent class
+TARGET: 6/12
+
+- add a queue class that stores images and results using mutex
+TARGET: 6/15 
+
+- Multithread the processing
+- Multithread the frame acuisation if async is true
+
+--- By here, detection should be working ---
+TARGET: 6/19
+
+- add segmentation coloring capability
+- add classification capability
+TARGET: 6/23
+
+- test with a couple of examples
+
+--- get feedback here ----
+TARGET: 6/26
+
+- incorporate any feedback
+TARGET: 7/7
+
+- clean up code
+- PR
+TARGET: 7/14
+
+*/
+
+
 namespace cv {
 namespace dnn {
 CV__DNN_INLINE_NS_BEGIN
 //! @addtogroup dnn
 //! @{
 
+
 class CV_EXPORTS_W_SIMPLE Model : public Net
 {
 public:
+    /**
+     * @brief Construct a new Model object. This argument will initialize a
+     * dnn::Net object by automatically detecting which type of weights file
+     * is passed in
+     * 
+     * @param weightsFile Weights in a supported format. See Model::BACKEND
+     * @param config Optional config file to optimize loading the model 
+     * @param width Input image width
+     * @param height Input image height
+     * @param mean Value to subtract from each pixel
+     * @param scale Scale factor for each pixel
+     */
     Model(const std::string &weightsFile, const std::string &config = "", int width = -1, int height = -1, Scalar mean = Scalar(), float scale = 1.0);
+    /**
+     * @brief Set the Video Capture object. This will provide a source to input
+     * images from
+     * 
+     * @param cap the video capture device
+     * @param async Capture frames asynchronously 
+     */
+    void setVideoCapture(VideoCapture &cap, bool async = true);
+
+    /**
+     * @brief Get the next available Frame, which will be annotated with outputs
+     * 
+     * @param[out] frame 
+     */
+    void getFrame(Mat &frame);
+
     ~Model();    
 private:
+    enum class BACKEND {
+        TENSORFLOW,
+        TORCH,
+        DARKNET,
+        CAFFE,
+        UNDEF
+    };
+
+    std::vector<std::string> m_classes;
+    int m_width;
+    int m_height;
+    Scalar m_mean;
+    float m_scale;
+    VideoCapture m_inputVideo;
+    bool m_async;
+
+    Mat preprocess(Mat &frame);
+    void postprocess(Mat &frame);
+
+    void drawBB(int classId, float conf, int left, int top, int right,
+        int bottom, Mat& frame);
 };
 //! @}
 CV__DNN_INLINE_NS_END
